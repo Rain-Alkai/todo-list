@@ -10,8 +10,11 @@ import EditIcon from '@mui/icons-material/Edit';
 import HighlightOffIcon from '@mui/icons-material/HighlightOff';
 import ExitToAppRoundedIcon from '@mui/icons-material/ExitToAppRounded';
 import CheckCircleOutlineRoundedIcon from '@mui/icons-material/CheckCircleOutlineRounded';
+import {  doc, setDoc,collection,addDoc,updateDoc,arrayUnion} from "firebase/firestore"; 
+
 export default function Homepage() {
     const [todo, setTodo]=useState("");
+    const [DueDate, setDueDate]=useState("");
     const [todos, setTodos] =useState([]);
     const[isEdit,setIsEdit]=useState(false);
     const [tempUidd, setTempUidd]= useState("");
@@ -45,11 +48,14 @@ export default function Homepage() {
     };
     
     const writeToDatabase=()=>{
-        const uidd =uid(); 
-        set(ref(db, `/${auth.currentUser.uid}/${uidd}`),{
-            todo: todo,
-            uidd: uidd,
-        });
+        const userRef=doc(db,"Users",auth.currentUser.uid);
+        const collectionRef= collection(db,"tasks");
+        const uuid=uid ();
+        updateDoc (userRef, {tasks:arrayUnion(uuid)});
+        addDoc(collectionRef,{title:todo,DueDate,Status:"incomplete"});
+        
+        
+       
 
         setTodo("");
         
@@ -79,13 +85,13 @@ export default function Homepage() {
   
 
   return (
-    <div
+    <div 
         className="homepage">
         <input
         className="add-edit-input"
 
         type="text" placeholder ="   Add todo... " value={todo} onChange={(e) => setTodo(e.target.value)}/>
-        
+        <input type="date" value={DueDate} onChange={(e) => setDueDate( new Date( e.target.value).valueOf()) }></input>
         {todos.map((todo) => (
             <div className="todo">
 

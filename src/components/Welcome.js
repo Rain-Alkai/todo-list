@@ -1,10 +1,11 @@
 import React, {useState,useEffect} from 'react';
 import { signInWithEmailAndPassword, onAuthStateChange,createUserWithEmailAndPassword } from "firebase/auth";
-import { auth } from '../firebase.js';
+import { auth ,db} from '../firebase.js';
 import {useNavigate} from"react-router-dom";
 import './welcome.css'
 import todosvg from '../assets/todo-svg.svg'
 import { sendEmailVerification } from 'firebase/auth';
+import {  doc, setDoc } from "firebase/firestore"; 
 
 export default function Welcome() {
     const [email, setEmail]= useState("");
@@ -12,6 +13,7 @@ export default function Welcome() {
     const navigate=useNavigate();
     const[isRegistering,setIsRgistering]=useState(false);
     const[registerInformation,setRegisterInformation]=useState({    
+        name:"",
         email:"",
         confirmEmail:"",
         password:"",
@@ -40,7 +42,11 @@ export default function Welcome() {
     alert("Please confirm your email or password")
     return 
   }
-    createUserWithEmailAndPassword(auth,registerInformation.email,registerInformation.password).then(()=>{
+    createUserWithEmailAndPassword(auth,registerInformation.email,registerInformation.password,).then((Users)=>{
+        const collectionRef =doc (db,"Users",Users.user.uid); 
+        setDoc (collectionRef, {name: registerInformation.name,email: registerInformation.email,tasks:[]});
+
+        
         navigate("/homepage");
     }).catch((err) => alert(auth,email,password)
  )};  
@@ -51,7 +57,9 @@ export default function Welcome() {
         <div className="login-register-container">
           {
             isRegistering ?(<>
+              <input type="name" placeholder=" Name"value={registerInformation.name} onChange={(e)=>setRegisterInformation({...registerInformation,name: e.target.value})}/>
               <input type="email" placeholder=" Email"value={registerInformation.email} onChange={(e)=>setRegisterInformation({...registerInformation,email: e.target.value})}/>
+              
               <input type="email" placeholder=" Confirm Email"value={registerInformation.confirmEmail} onChange={(e)=>setRegisterInformation({...registerInformation,confirmEmail: e.target.value})}/>
             <input type="password" placeholder=" Password" value={registerInformation.password} onChange={(e)=>setRegisterInformation({...registerInformation,password: e.target.value})}/>
             <input type="password" placeholder=" Confirm Password"value={registerInformation.confirmPassword} onChange={(e)=>setRegisterInformation({...registerInformation,confirmPassword: e.target.value})}/>

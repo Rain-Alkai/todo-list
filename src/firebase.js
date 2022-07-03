@@ -1,6 +1,6 @@
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
-import {getDatabase} from "firebase/database";
+import {getFirestore} from "firebase/firestore";
 import {getAuth} from "firebase/auth";
 
 // TODO: Add SDKs for Firebase products that you want to use
@@ -15,9 +15,10 @@ const firebaseConfig = {
   storageBucket: "todo-list-b88b9.appspot.com",
   messagingSenderId: "497774881647",
   appId: "1:497774881647:web:1d05a3fd106b488d60969a"
+
 };
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
-export const db=getDatabase(app);
+export const db=getFirestore(app);
 export const auth=getAuth();
