@@ -10,7 +10,7 @@ import EditIcon from '@mui/icons-material/Edit';
 import HighlightOffIcon from '@mui/icons-material/HighlightOff';
 import ExitToAppRoundedIcon from '@mui/icons-material/ExitToAppRounded';
 import CheckCircleOutlineRoundedIcon from '@mui/icons-material/CheckCircleOutlineRounded';
-import {  doc, setDoc,collection,addDoc,updateDoc,arrayUnion} from "firebase/firestore"; 
+import {  doc, setDoc,collection,addDoc,updateDoc,arrayUnion,onSnapshot,query, where} from "firebase/firestore"; 
 
 export default function Homepage() {
     const [todo, setTodo]=useState("");
@@ -24,14 +24,15 @@ export default function Homepage() {
     useEffect(()=>{
         auth.onAuthStateChanged(user=>{
             if (user){
-            onValue(ref(db, `/${auth.currentUser.uid}`),snapshot=>{
+            onSnapshot(query(  collection(db, "tasks"),where("owner","==",auth.currentUser.uid)),snapshots=>{
                 setTodos([]);
-                const data=snapshot.val();
-                if(data !==null){
-                    Object.values(data).map(todo =>{
-                        setTodos((oldArray)=>[...oldArray,todo]);
-                    });
-                };
+                const List=[];
+                snapshots.forEach(doc=>{ 
+                    List.push(doc.data())
+
+
+                 })
+                 setTodos(List);
             });
             }
             else if(!user){
@@ -52,7 +53,7 @@ export default function Homepage() {
         const collectionRef= collection(db,"tasks");
         const uuid=uid ();
         updateDoc (userRef, {tasks:arrayUnion(uuid)});
-        addDoc(collectionRef,{title:todo,DueDate,Status:"incomplete"});
+        addDoc(collectionRef,{title:todo,DueDate,Status:"incomplete",owner:auth.currentUser.uid});
         
         
        
@@ -95,9 +96,9 @@ export default function Homepage() {
         {todos.map((todo) => (
             <div className="todo">
 
-                <h1>{todo.todo}</h1>
+                <h1>{todo.title}</h1>
                 <EditIcon fontSize="large" onClick ={()=>handleUpdate(todo)} className="edit-button"/>
-                <HighlightOffIcon fontSize="large" onClick={()=> handleDelete(todo.uidd)} className="delete-button"/>
+                <HighlightOffIcon fontSize="large" onClick={()=> handleDelete(todo.title)} className="delete-button"/>
 
             </div>
         ))}
