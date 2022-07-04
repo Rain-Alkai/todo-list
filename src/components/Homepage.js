@@ -1,7 +1,7 @@
 import React, { useEffect,useState } from 'react';
 import { signOut,onAuthStateChanged } from "firebase/auth";
 import { auth,db } from "../firebase.js";
-import{useNavigate} from "react-router-dom";
+import{useNavigate, useParams, } from "react-router-dom";
 import { uid } from "uid";
 import {set,ref, onValue, remove,update} from "firebase/database";
 import './homepage.css';
@@ -10,17 +10,18 @@ import EditIcon from '@mui/icons-material/Edit';
 import HighlightOffIcon from '@mui/icons-material/HighlightOff';
 import ExitToAppRoundedIcon from '@mui/icons-material/ExitToAppRounded';
 import CheckCircleOutlineRoundedIcon from '@mui/icons-material/CheckCircleOutlineRounded';
-import {  doc, setDoc,collection,addDoc,updateDoc,arrayUnion,onSnapshot,query, where} from "firebase/firestore"; 
+import {  deleteDoc,doc, setDoc,collection,addDoc,updateDoc,arrayUnion,onSnapshot,query, where, arrayRemove} from "firebase/firestore"; 
+import { Checkbox } from '@mui/material';
 
 export default function Homepage() {
     const [todo, setTodo]=useState("");
-    const [DueDate, setDueDate]=useState("");
+    const [DueDate, setDueDate]=useState(0);
     const [todos, setTodos] =useState([]);
     const[isEdit,setIsEdit]=useState(false);
     const [tempUidd, setTempUidd]= useState("");
     const navigate = useNavigate();
    
-
+    
     useEffect(()=>{
         auth.onAuthStateChanged(user=>{
             if (user){
@@ -49,11 +50,14 @@ export default function Homepage() {
     };
     
     const writeToDatabase=()=>{
+        console.log(DueDate)
+        if(!todo||!DueDate) return ;
         const userRef=doc(db,"Users",auth.currentUser.uid);
-        const collectionRef= collection(db,"tasks");
+       
         const uuid=uid ();
+        const collectionRef= doc(db,"tasks",uuid);
         updateDoc (userRef, {tasks:arrayUnion(uuid)});
-        addDoc(collectionRef,{title:todo,DueDate,Status:"incomplete",owner:auth.currentUser.uid});
+        setDoc(collectionRef,{title:todo,DueDate,Status:"incomplete",owner: auth.currentUser.uid, uuid});
         
         
        
@@ -65,22 +69,27 @@ export default function Homepage() {
     };
     const handleUpdate = (todo) => {
         setIsEdit(true);
-        setTodo(todo.todo);
-        setTempUidd(todo.uidd);
+        setTodo(todo.title);
+        setTempUidd(todo.uuid);
         
     };
     
-    
+    const handleComplete=(e,todo)=>{
+        updateDoc(doc(db,"tasks",todo.uuid) , {Status:e.currentTarget.checked? "complete": `incomplete`})
+
+    };
     const handleEditConfirm=()=>{
-        update(ref(db, `/${auth.currentUser.uid}/${tempUidd}`),{
-            todo: todo,
-            tempUidd: tempUidd
+        updateDoc(doc(db,"tasks",tempUidd),{
+            title: todo,
+           
         });
         setTodo("");
         setIsEdit(false);
     };
     const handleDelete = (uid) =>{
-        remove(ref(db, `/${auth.currentUser.uid}/${uid}`));
+        deleteDoc(doc(db, "tasks",uid));
+        const userRef=doc(db,"Users",auth.currentUser.uid);
+        updateDoc(userRef,{tasks: arrayRemove(uid)})
         
     };
   
@@ -90,18 +99,24 @@ export default function Homepage() {
         className="homepage">
         <input
         className="add-edit-input"
-
+        
         type="text" placeholder ="   Add todo... " value={todo} onChange={(e) => setTodo(e.target.value)}/>
-        <input type="date" value={DueDate} onChange={(e) => setDueDate( new Date( e.target.value).valueOf()) }></input>
-        {todos.map((todo) => (
-            <div className="todo">
+        <input type="date"  onChange={(e) => setDueDate( new Date( e.target.value).valueOf()) }></input>
+        {todos.map((todo) => {
+            const currentDate= Date.now();
+            if(currentDate>todo.DueDate&& todo.Status=="incomplete"){
+                updateDoc(doc(db,"tasks",todo.uuid) , {Status:`fail`})
+            }
+
+            return <div className="todo">
 
                 <h1>{todo.title}</h1>
+                {todo.Status!="fail" &&  <input type="checkbox" onChange={(e)=> handleComplete(e,todo)}></input>}
                 <EditIcon fontSize="large" onClick ={()=>handleUpdate(todo)} className="edit-button"/>
-                <HighlightOffIcon fontSize="large" onClick={()=> handleDelete(todo.title)} className="delete-button"/>
+                <HighlightOffIcon fontSize="large" onClick={()=> handleDelete(todo.uuid)} className="delete-button"/>
 
             </div>
-        ))}
+        })}
        
 
         {isEdit ? (
