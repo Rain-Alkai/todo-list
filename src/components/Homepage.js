@@ -21,10 +21,11 @@ export default function Homepage() {
     const [tempUidd, setTempUidd]= useState("");
     const navigate = useNavigate();
    
-    
+
     useEffect(()=>{
         auth.onAuthStateChanged(user=>{
             if (user){
+                //instead of auth.currentUser.uid only put id
             onSnapshot(query(  collection(db, "tasks"),where("owner","==",auth.currentUser.uid)),snapshots=>{
                 setTodos([]);
                 const List=[];
@@ -101,7 +102,7 @@ export default function Homepage() {
         className="add-edit-input"
         
         type="text" placeholder ="   Add todo... " value={todo} onChange={(e) => setTodo(e.target.value)}/>
-        <input type="date"  onChange={(e) => setDueDate( new Date( e.target.value).valueOf()) }></input>
+        <input type="date"  onChange={(e) => setDueDate( new Date( e.target.value).valueOf()) } className="date"></input>
         {todos.map((todo) => {
             const currentDate= Date.now();
             if(currentDate>todo.DueDate&& todo.Status=="incomplete"){
@@ -111,10 +112,10 @@ export default function Homepage() {
             return <div className="todo">
 
                 <h1>{todo.title}</h1>
-                {todo.Status!="fail" &&  <input type="checkbox" onChange={(e)=> handleComplete(e,todo)}></input>}
+                
                 <EditIcon fontSize="large" onClick ={()=>handleUpdate(todo)} className="edit-button"/>
                 <HighlightOffIcon fontSize="large" onClick={()=> handleDelete(todo.uuid)} className="delete-button"/>
-
+                {todo.Status!="fail" &&  <input type="checkbox" onChange={(e)=> handleComplete(e,todo)}  className="checkbox"></input>}
             </div>
         })}
        
