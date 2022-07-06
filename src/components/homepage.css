@@ -77,3 +77,11 @@
     top:15px;
     color: white;
 }
+.share{
+    cursor: pointer;
+    right: 70px;
+    position: absolute;
+    top:15px;
+    color: white;
+
+}

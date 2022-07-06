@@ -1,0 +1,25 @@
+/*import { useState, useEffect } from "react"
+import { auth, db } from "../firebase.js"
+import "./homepage.css"
+
+function Fetch() {
+  const [todos, setTodos] = useState()
+
+  useEffect(() => {
+    return onValue(ref(db, "/todos"), (querySnapShot) => {
+      let data = querySnapShot.val() || {}
+      let todoItems = { ...data }
+      setTodos(todoItems)
+    })
+  })
+
+  return (
+    <>
+      {todos.map((todo) => {
+        return <h1>{todo.title}</h1>
+      })}
+    </>
+  )
+}
+export default Fetch
+*/
