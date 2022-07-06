@@ -15,6 +15,13 @@
     
     font-size: 25px;
 }
+.share{
+    height: 20px;
+    width: 20px;
+    top:25px;
+    right:370px;
+    position: absolute;
+}
 .add-icon {
     position: absolute;
     transform: scale(1.6);

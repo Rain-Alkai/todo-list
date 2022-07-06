@@ -20,7 +20,7 @@ export default function Homepage() {
     const[isEdit,setIsEdit]=useState(false);
     const [tempUidd, setTempUidd]= useState("");
     const navigate = useNavigate();
-   
+    
 
     useEffect(()=>{
         auth.onAuthStateChanged(user=>{
@@ -93,6 +93,11 @@ export default function Homepage() {
         updateDoc(userRef,{tasks: arrayRemove(uid)})
         
     };
+
+    
+
+
+
   
 
   return (
@@ -102,13 +107,17 @@ export default function Homepage() {
         className="add-edit-input"
         
         type="text" placeholder ="   Add todo... " value={todo} onChange={(e) => setTodo(e.target.value)}/>
+        <button
+                onClick={()=>{navigate("/share")}} share className="share"
+
+            ></button>
         <input type="date"  onChange={(e) => setDueDate( new Date( e.target.value).valueOf()) } className="date"></input>
         {todos.map((todo) => {
             const currentDate= Date.now();
             if(currentDate>todo.DueDate&& todo.Status=="incomplete"){
                 updateDoc(doc(db,"tasks",todo.uuid) , {Status:`fail`})
             }
-
+            
             return <div className="todo">
 
                 <h1>{todo.title}</h1>
@@ -116,6 +125,7 @@ export default function Homepage() {
                 <EditIcon fontSize="large" onClick ={()=>handleUpdate(todo)} className="edit-button"/>
                 <HighlightOffIcon fontSize="large" onClick={()=> handleDelete(todo.uuid)} className="delete-button"/>
                 {todo.Status!="fail" &&  <input type="checkbox" onChange={(e)=> handleComplete(e,todo)}  className="checkbox"></input>}
+                
             </div>
         })}
        

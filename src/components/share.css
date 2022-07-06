@@ -1,0 +1,20 @@
+.popup{
+    height: 200px;
+    width: 500px;
+    background-color: pink;
+    position: absolute;
+    top: 25%;
+    right:25%;
+}
+.popup-header{
+display: flex;
+justify-content: space-between;
+padding: 10px 30px 10px 15px;
+border-bottom: 2px solid black;}
+.btn{
+    height: 20px;
+    width: 20px;
+    position: absolute;
+    top: 1%;
+    right:1%;
+}

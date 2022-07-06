@@ -12,6 +12,7 @@ export default function Welcome() {
     const [password, setPassword]= useState("");
     const navigate=useNavigate();
     const[isRegistering,setIsRgistering]=useState(false);
+    
     const[registerInformation,setRegisterInformation]=useState({    
         name:"",
         email:"",
@@ -45,7 +46,7 @@ export default function Welcome() {
     createUserWithEmailAndPassword(auth,registerInformation.email,registerInformation.password,).then((Users)=>{
         const collectionRef =doc (db,"Users",Users.user.uid); 
         setDoc (collectionRef, {name: registerInformation.name,email: registerInformation.email,tasks:[]});
-
+        
         
         navigate("/homepage");
     }).catch((err) => alert(auth,email,password)
