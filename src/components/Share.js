@@ -1,13 +1,19 @@
 import React,{useState} from 'react'
 import { auth ,db} from '../firebase.js';
 import './share.css'
+import Fetch from "../components/fetch"
+import firebase from"firebase";
 export default function Share() {
     const[popup,setPopup]=useState(false);
 
     const baseUrL = 'http://localhost:3000/homepage';
 
     const  sharedURL = `${baseUrL}/Share?${auth.currentUser.uid}`;
-
+    function getUserData(uid) {
+            firebase.database().ref('users/' + uid).once("value", snap => {
+            console.log(snap.val())
+        })
+    }
     const openPopup = () => {
         setPopup(true);
     }
@@ -15,8 +21,10 @@ export default function Share() {
     const closePopup=()=>{
         setPopup(false);
     }
+    
 
   return (
+   
     <div>Share
         <h1>Todo-List</h1>
         <button className="url" onClick={openPopup} > create url</button>
@@ -37,5 +45,8 @@ export default function Share() {
         </div>
     </div>
 
+
+
+    
   )
 }
